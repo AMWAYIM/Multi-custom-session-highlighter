@@ -1,0 +1,45 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © TraderAmwayi
+
+//@version=6
+indicator("Multi Custom Session Highlighter", overlay=true)
+
+// === User Inputs === //
+timezoneOffset = input.int(3, "Time Zone Offset (e.g., UTC+3)", minval=-12, maxval=14)
+sessionColor = input.color(color.new(color.green, 85), "Highlight Color")
+
+// === Session 1 === //
+session1Enabled = input.bool(true, "Enable Session 1")
+s1StartHour = input.int(8, "Session 1 Start Hour", minval=0, maxval=23)
+s1StartMinute = input.int(0, "Session 1 Start Minute", minval=0, maxval=59)
+s1EndHour = input.int(11, "Session 1 End Hour", minval=0, maxval=23)
+s1EndMinute = input.int(0, "Session 1 End Minute", minval=0, maxval=59)
+
+// === Session 2 === //
+session2Enabled = input.bool(true, "Enable Session 2")
+s2StartHour = input.int(15, "Session 2 Start Hour", minval=0, maxval=23)
+s2StartMinute = input.int(0, "Session 2 Start Minute", minval=0, maxval=59)
+s2EndHour = input.int(18, "Session 2 End Hour", minval=0, maxval=23)
+s2EndMinute = input.int(0, "Session 2 End Minute", minval=0, maxval=59)
+
+// === Session 3 === //
+session3Enabled = input.bool(false, "Enable Session 3")
+s3StartHour = input.int(20, "Session 3 Start Hour", minval=0, maxval=23)
+s3StartMinute = input.int(0, "Session 3 Start Minute", minval=0, maxval=59)
+s3EndHour = input.int(22, "Session 3 End Hour", minval=0, maxval=23)
+s3EndMinute = input.int(0, "Session 3 End Minute", minval=0, maxval=59)
+
+// === Time Conversion Function === //
+getTimestamp(hourVal, minVal) =>
+    timestamp("UTC", year(time), month(time), dayofmonth(time), hourVal - timezoneOffset, minVal)
+
+// === Session Checks === //
+inSession1 = session1Enabled and (time >= getTimestamp(s1StartHour, s1StartMinute) and time <= getTimestamp(s1EndHour, s1EndMinute))
+inSession2 = session2Enabled and (time >= getTimestamp(s2StartHour, s2StartMinute) and time <= getTimestamp(s2EndHour, s2EndMinute))
+inSession3 = session3Enabled and (time >= getTimestamp(s3StartHour, s3StartMinute) and time <= getTimestamp(s3EndHour, s3EndMinute))
+
+// === Combined Session Check === //
+inAnySession = inSession1 or inSession2 or inSession3
+
+// === Highlight Background === //
+bgcolor(inAnySession ? sessionColor : na)
